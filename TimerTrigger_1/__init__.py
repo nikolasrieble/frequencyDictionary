@@ -5,7 +5,7 @@ import azure.functions as func
 import newspaper
 import os
 
-
+# todo: take out this configuration somewhere else
 input_list = [
     ('tr', 'https://www.sozcu.com.tr/'),
     ('de', 'https://www.faz.net/')
@@ -29,10 +29,13 @@ def main(mytimer: func.TimerRequest) -> None:
         for article in paper.articles:
             article.download()
             article.parse()
-            collection.insert_one({
-            'text' : article.text,
-            'fetched_at' : datetime.datetime.now(),
-            'headline' : article.title,
-            'url': article.url})
+
+            # prevent duplicates
+            if collection.count_documents({'headline':article.title}) == 0:
+                collection.insert_one({
+                'text' : article.text,
+                'fetched_at' : datetime.datetime.now(),
+                'headline' : article.title,
+                'url': article.url})
             
     logging.info('Python timer trigger function ran at %s', utc_timestamp)
