@@ -3,7 +3,6 @@ import logging
 import pymongo
 import azure.functions as func
 import newspaper
-from utils.conn_str import conn_str
 
 # todo: take out this configuration somewhere else
 input_list = [
