@@ -11,6 +11,13 @@ input_list = [
     ('de', 'https://www.faz.net/')
 ]
 
+def get_connection():
+    try: 
+        from utils.conn_str import conn_str
+        return conn_str
+    except: 
+        import os
+        return os.environ.get('MONGO_DB')
 
 def main(mytimer: func.TimerRequest) -> None:
     utc_timestamp = datetime.datetime.utcnow().replace(
@@ -18,7 +25,7 @@ def main(mytimer: func.TimerRequest) -> None:
     if mytimer.past_due:
         logging.info('The timer is past due!')
 
-    myclient = pymongo.MongoClient(conn_str)
+    myclient = pymongo.MongoClient(get_connection())
     mydb = myclient['newspaper']
 
     for language, url in input_list:
@@ -26,7 +33,7 @@ def main(mytimer: func.TimerRequest) -> None:
 
         paper = newspaper.build(url, language=language, memoize_articles=False)
         for article in paper.articles:
-            article.downloadhihhi()
+            article.download()
             article.parse()
 
             # prevent duplicates
@@ -38,4 +45,3 @@ def main(mytimer: func.TimerRequest) -> None:
                     'url': article.url})
 
     logging.info('Python timer trigger function ran at %s', utc_timestamp)
-
