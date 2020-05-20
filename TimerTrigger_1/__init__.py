@@ -3,6 +3,7 @@ import logging
 import pymongo
 import azure.functions as func
 import newspaper
+from utils.get_connection import get_connection
 
 # todo: take out this configuration somewhere else
 input_list = [
@@ -10,13 +11,6 @@ input_list = [
     ('de', 'https://www.faz.net/')
 ]
 
-def get_connection():
-    try: 
-        from utils.conn_str import conn_str
-        return conn_str
-    except: 
-        import os
-        return os.environ.get('MONGO_DB')
 
 def main(mytimer: func.TimerRequest) -> None:
     utc_timestamp = datetime.datetime.utcnow().replace(
