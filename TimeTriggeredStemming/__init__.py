@@ -1,9 +1,8 @@
 import datetime
 import logging
-import pymongo
 
 import azure.functions as func
-from utils.get_connection import get_connection
+from utils.get_connection import get_mydb
 
 
 def extract_words(article):
@@ -18,8 +17,7 @@ def main(mytimer: func.TimerRequest) -> None:
     if mytimer.past_due:
         logging.info('The timer is past due!')
 
-    myclient = pymongo.MongoClient(get_connection())
-    mydb = myclient['newspaper']
+    mydb = get_mydb()
 
     for name in mydb.collection_names():
         logging.info('now checking collection %s', name)

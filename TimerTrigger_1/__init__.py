@@ -1,9 +1,10 @@
 import datetime
 import logging
-import pymongo
+
 import azure.functions as func
 import newspaper
-from utils.get_connection import get_connection
+
+from utils.get_connection import get_mydb
 
 # todo: take out this configuration somewhere else
 input_list = [
@@ -18,8 +19,7 @@ def main(mytimer: func.TimerRequest) -> None:
     if mytimer.past_due:
         logging.info('The timer is past due!')
 
-    myclient = pymongo.MongoClient(get_connection())
-    mydb = myclient['newspaper']
+    mydb = get_mydb()
 
     for language, url in input_list:
         collection = mydb[language]
