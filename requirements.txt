@@ -4,8 +4,3 @@ grpcio-tools
 newspaper3k
 pymongo
 dnspython
-dash-renderer
-dash
-dash-html-components
-dash-core-components
-plotly
