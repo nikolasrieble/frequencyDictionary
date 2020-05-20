@@ -3,14 +3,20 @@ import logging
 import pymongo
 import azure.functions as func
 import newspaper
-import os
 
 # todo: take out this configuration somewhere else
 input_list = [
     ('tr', 'https://www.sozcu.com.tr/'),
     ('de', 'https://www.faz.net/')
-    ]
+]
 
+def get_connection():
+    try: 
+        from utils.conn_str import conn_str
+        return conn_str
+    except: 
+        import os
+        return os.environ.get('MONGO_DB')
 
 def main(mytimer: func.TimerRequest) -> None:
     utc_timestamp = datetime.datetime.utcnow().replace(
@@ -18,8 +24,7 @@ def main(mytimer: func.TimerRequest) -> None:
     if mytimer.past_due:
         logging.info('The timer is past due!')
 
-    conn = os.environ.get('MONGO_DB')
-    myclient = pymongo.MongoClient(conn)
+    myclient = pymongo.MongoClient(get_connection())
     mydb = myclient['newspaper']
 
     for language, url in input_list:
@@ -31,11 +36,11 @@ def main(mytimer: func.TimerRequest) -> None:
             article.parse()
 
             # prevent duplicates
-            if collection.count_documents({'headline':article.title}) == 0:
+            if collection.count_documents({'headline': article.title}) == 0:
                 collection.insert_one({
-                'text' : article.text,
-                'fetched_at' : datetime.datetime.now(),
-                'headline' : article.title,
-                'url': article.url})
-            
+                    'text': article.text,
+                    'fetched_at': datetime.datetime.now(),
+                    'headline': article.title,
+                    'url': article.url})
+
     logging.info('Python timer trigger function ran at %s', utc_timestamp)
