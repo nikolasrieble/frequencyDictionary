@@ -5,3 +5,4 @@ newspaper3k
 pymongo
 dnspython
 dash
+gunicorn
