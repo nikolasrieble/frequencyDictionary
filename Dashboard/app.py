@@ -2,6 +2,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_table
+import os
 
 from utils.prepare_data import most_common_columns, most_common_data, desc_stat_columns, desc_stat_data
 
@@ -9,6 +10,7 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 server = app.server
+mongodb = os.environ['MONGODB_CONN']
 
 app.layout = html.Div(children=[
     html.H1(children='Newspaper'),
@@ -36,6 +38,7 @@ app.layout = html.Div(children=[
         columns=most_common_columns,
         data=most_common_data,
     ),
+    html.A(f'{mongodb}')
 ])
 
 if __name__ == '__main__':
