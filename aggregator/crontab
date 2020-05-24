@@ -1,3 +1,3 @@
-SHELL=/bin/bash
-BASH_ENV=/container.env
-*/10 * * * * root /opt/conda/bin/python3.7 job.py
+* * * * * echo "Hello world" >> /dev/stdout 2>&1
+* * * * * python /job.py
+# crontab requires an empty line at the end of the file
