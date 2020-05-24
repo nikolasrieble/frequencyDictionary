@@ -1,0 +1,22 @@
+FROM alpine:3.6
+FROM python:3.7
+
+ADD ./requirements.txt ./requirements.txt
+
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
+
+USER root
+
+ADD . .
+
+ADD crontab /etc/cron.d/crontab
+
+RUN apt-get update && apt-get -y install cron
+RUN chmod 0644 /etc/cron.d/crontab
+RUN chmod +x run.sh
+
+# make the file executable
+RUN chmod u+x job.py
+
+CMD ./run.sh

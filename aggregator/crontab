@@ -1,0 +1,3 @@
+SHELL=/bin/bash
+BASH_ENV=/container.env
+*/10 * * * * root /opt/conda/bin/python3.7 job.py
