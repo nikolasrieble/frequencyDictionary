@@ -38,7 +38,7 @@ app.layout = html.Div(children=[
         columns=most_common_columns,
         data=most_common_data,
     ),
-    html.A(f'{mongodb}')
+
 ])
 
 if __name__ == '__main__':
