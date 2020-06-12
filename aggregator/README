@@ -1,0 +1,18 @@
+following 
+https://docs.microsoft.com/en-us/learn/modules/deploy-run-container-app-service/5-exercise-deploy-web-app?pivots=csharp
+
+# Build the image and tag it
+docker build aggregator -t aggregator
+
+# Associate the tag with the container registry
+docker tag aggregator nikolasrieble.azurecr.io/aggregator
+
+# Push to the registry 
+docker push nikolasrieble.azurecr.io/aggregatordocker pull nikolasrieble.azurecr.io/hello-world
+
+
+
+##########
+
+# docker compose from
+https://github.com/dennisobrien/airflow-docker-compose-example/blob/master/docker-compose.yml

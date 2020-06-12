@@ -1,3 +1,0 @@
-* * * * * echo "Hello world" >> /dev/stdout 2>&1
-* * * * * python /job.py
-# crontab requires an empty line at the end of the file

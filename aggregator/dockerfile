@@ -1,16 +1,4 @@
-FROM python:3.8-alpine
+FROM puckel/docker-airflow:latest
 
 COPY ./requirements.txt ./requirements.txt
-COPY job.py job.py
-
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
-
-# Configure cron
-COPY crontab /etc/cron/crontab
-
-RUN chmod 0644 /etc/cron/crontab
-# Init cron
-RUN crontab /etc/cron/crontab
-
-CMD ["crond", "-f"]
+COPY dags /usr/local/airflow/dags
