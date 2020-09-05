@@ -9,7 +9,7 @@ from flask_apscheduler import APScheduler
 from Scraper.src.configuration import Configuration
 from Scraper.src.database import Database
 
-with open('configuration.json', 'r') as json_file:
+with open('../configuration.json', 'r') as json_file:
     raw_config = json_file.read()
 Config = dacite.from_dict(data_class=Configuration, data=json.loads(raw_config))
 
