@@ -5,6 +5,7 @@ import dacite
 import newspaper
 from flask import Flask
 from flask_apscheduler import APScheduler
+from newspaper import ArticleException
 
 from Scraper.src.configuration import Configuration
 from Scraper.src.database import Database
@@ -41,17 +42,23 @@ def scrape():
     ]:
         paper = newspaper.build(url, language=language, memoize_articles=False)
         for article in paper.articles:
-            article.download()
-            article.parse()
 
-            database.insert(
-                {
-                    'text': article.text,
-                    'fetched_at': datetime.datetime.now(),
-                    'headline': article.title,
-                    'url': article.url
-                }
-            )
+            try:
+                article.download()
+                article.parse()
+
+                database.insert(
+                    {
+                        'text': article.text,
+                        'fetched_at': datetime.datetime.now(),
+                        'title': article.title,
+                        'url': article.url
+                    }
+                )
+            except ArticleException:
+                continue
+
+
 
     print('Ran scrape function')
 

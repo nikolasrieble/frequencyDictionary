@@ -1,3 +1,5 @@
 Flask==1.1.1
 flask_apscheduler
 newspaper3k
+dnspython
+pymongo
