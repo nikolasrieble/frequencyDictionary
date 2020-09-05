@@ -1,6 +1,6 @@
 import pymongo
 
-from Scraper.src.configuration import MongoConfiguration
+from configuration import MongoConfiguration
 
 
 class Database:

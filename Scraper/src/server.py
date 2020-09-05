@@ -7,10 +7,10 @@ from flask import Flask
 from flask_apscheduler import APScheduler
 from newspaper import ArticleException
 
-from Scraper.src.configuration import Configuration
-from Scraper.src.database import Database
+from configuration import Configuration
+from database import Database
 
-with open('../configuration.json', 'r') as json_file:
+with open('configuration.json', 'r') as json_file:
     raw_config = json_file.read()
 Config = dacite.from_dict(data_class=Configuration, data=json.loads(raw_config))
 
@@ -57,9 +57,6 @@ def scrape():
                 )
             except ArticleException:
                 continue
-
-
-
     print('Ran scrape function')
 
 
@@ -71,4 +68,4 @@ if __name__ == '__main__':
     scheduler.init_app(app)
     scheduler.start()
 
-    app.run(host='0.0.0.0', port=12345)
+    app.run(host='0.0.0.0', port=5000)

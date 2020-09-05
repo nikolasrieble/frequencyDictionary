@@ -1,5 +1,6 @@
-Flask==1.1.1
+Flask==1.1.2
 flask_apscheduler
 newspaper3k
 dnspython
 pymongo
+dacite
