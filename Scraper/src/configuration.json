@@ -1,0 +1,12 @@
+{
+  "database": {
+    "collection": "COLL",
+    "database": "DB",
+    "pw": "PASSWORD",
+    "user": "USER",
+    "url": "URL"
+  },
+  "backend": {
+    "SCHEDULER_API_ENABLED": true
+  }
+}

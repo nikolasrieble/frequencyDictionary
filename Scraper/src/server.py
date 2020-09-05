@@ -1,19 +1,21 @@
 import datetime
+import json
 
+import dacite
 import newspaper
 from flask import Flask
 from flask_apscheduler import APScheduler
 
+from Scraper.src.configuration import Configuration
 from Scraper.src.database import Database
 
-
-class Config(object):
-    SCHEDULER_API_ENABLED = True
-
+with open('configuration.json', 'r') as json_file:
+    raw_config = json_file.read()
+Config = dacite.from_dict(data_class=Configuration, data=json.loads(raw_config))
 
 app = Flask(__name__)
 scheduler = APScheduler()
-database = Database()
+database = Database(Config.database)
 
 
 @app.route('/')
@@ -55,7 +57,7 @@ def scrape():
 
 
 if __name__ == '__main__':
-    app.config.from_object(Config())
+    app.config.from_object(Config.backend)
 
     # it is also possible to enable the API directly
     # scheduler.api_enabled = True
