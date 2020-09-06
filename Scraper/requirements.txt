@@ -4,3 +4,4 @@ newspaper3k
 dnspython
 pymongo
 dacite
+gunicorn==20.0.4

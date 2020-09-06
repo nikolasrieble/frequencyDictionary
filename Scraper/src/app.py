@@ -30,13 +30,13 @@ def welcome():
 
 
 @app.route('/test_scraper')
-def trigger_scrape():
+def test_scraper():
     scrape(limit=1)
     return 'Scraping test triggered', 200
 
 
 @app.route('/trigger_scraper')
-def trigger_scrape():
+def trigger_scraper():
     scrape()
     return 'Scraping triggered', 200
 
@@ -55,7 +55,6 @@ def health():
 @scheduler.task('interval', id='scrape', hours=12, misfire_grace_time=900)
 def scrape(limit: int = None):
     for target in app.target:
-        print(target['url'], target['language'])
         paper = newspaper.build(target['url'], language=target['language'], memoize_articles=False)
         for idx, article in enumerate(paper.articles):
 
@@ -94,4 +93,4 @@ if __name__ == '__main__':
     scheduler.start()
 
     port = int(os.environ.get('PORT', DEFAULT_PORT))
-    app.run(host='0.0.0.0', port=port)
+    app.run(debug=True)
