@@ -2,10 +2,10 @@ import datetime
 import newspaper
 import os
 import pymongo
-from bs4 import BeautifulSoup
-from dateutil.parser import parse
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
+
+from airflow.default import default_args
 
 input_list = {
     'tr': 'https://www.sozcu.com.tr/',
@@ -14,65 +14,47 @@ input_list = {
 
 
 def newspaper_scraper(templates_dict, language, **context):
-    mongodb_string = templates_dict.get('mongodb_string')
-    assert mongodb_string
-    myclient = pymongo.MongoClient(mongodb_string)
-    mydb = myclient['newspaper']
-
-    collection = mydb[language]
+    collection = get_collection(language, templates_dict)
     newspaper_url = input_list.get(language)
+    timestamp = datetime.datetime.now()
 
-    paper = newspaper.build(newspaper_url, language=language, memoize_articles=False, MIN_WORD_COUNT=500)
+    paper = newspaper.build(newspaper_url, language=language, memoize_articles=False, MIN_WORD_COUNT=100)
     for article in paper.articles:
         article.download()
         article.parse()
 
-        url = article.url
-        authors = list(article.authors)
-        date_time = article.publish_date
-        title = article.title
-        text = article.text
-        tags = list(article.tags)
-
-        if not article.publish_date:
-            soup = BeautifulSoup(article.html, 'html.parser')
-            try:
-                date_time = soup.find('time')['datetime']
-                date_time = parse(date_time).strftime('%Y-%m-%d')
-            except:
-                date_time = datetime.datetime.now()
+        data = extract_data(article)
+        data["fetched_at"] = timestamp
 
         # prevent duplicates
         if collection.count_documents({'headline': article.title}) == 0:
-            collection.insert_one({
-                'text': text,
-                'authors': authors,
-                'fetched_at': date_time,
-                'headline': title,
-                'url': url,
-                'tags': tags
-            })
+            collection.insert_one(data)
 
     return
 
 
-dag_id = 'newspaper_scraper'
-schedule = '0 0 * * 0'
-default_args = {
-    'owner': 'niko_huy',
-    'start_date': datetime.datetime(2020, 2, 18),
-    'provide_context': True,
-    'retries': 1,
-    'retry_delay': datetime.timedelta(minutes=5),
-    'execution_timeout': datetime.timedelta(minutes=60),
-    'pool': 'default_pool',
-    'templates_dict': {
-        'mongodb_string': os.environ.get('MONGO_DB'),
-    }
-}
+def get_collection(language, templates_dict):
+    mongodb_string = templates_dict.get('mongodb_string')
+    assert mongodb_string
+    myclient = pymongo.MongoClient(mongodb_string)
+    mydb = myclient['newspaper']
+    collection = mydb[language]
+    return collection
 
-dag = DAG(dag_id,
-          schedule_interval=schedule,
+
+def extract_data(article):
+    return {
+        'published_at': article.publish_date,
+        'text': article.text,
+        'authors': list(article.authors),
+        'headline': article.title,
+        'url': article.url,
+        'tags': list(article.tags)
+    }
+
+
+dag = DAG('newspaper_scraper',
+          schedule_interval='0 0 * * 0',
           description=f'''Scrape website for newspaper''',
           default_args=default_args,
           catchup=False,
