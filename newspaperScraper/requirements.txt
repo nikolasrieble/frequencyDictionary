@@ -1,6 +1,0 @@
-azure-functions
-grpcio
-grpcio-tools
-newspaper3k
-pymongo
-dnspython
