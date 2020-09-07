@@ -28,11 +28,11 @@ def newspaper_scraper(templates_dict, language, **context):
         article.parse()
 
         url = article.url
-        authors = article.authors
+        authors = list(article.authors)
         date_time = article.publish_date
         title = article.title
         text = article.text
-        tags = article.tags
+        tags = list(article.tags)
 
         if not article.publish_date:
             soup = BeautifulSoup(article.html, 'html.parser')
