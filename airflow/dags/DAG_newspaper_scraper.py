@@ -34,11 +34,6 @@ def newspaper_scraper(templates_dict, language, **context):
         text = article.text
         tags = article.tags
 
-        article.nlp()
-
-        keywords = article.keywords
-        summary = article.summary
-
         if not article.publish_date:
             soup = BeautifulSoup(article.html, 'html.parser')
             try:
@@ -55,9 +50,7 @@ def newspaper_scraper(templates_dict, language, **context):
                 'fetched_at': date_time,
                 'headline': title,
                 'url': url,
-                'tags': tags,
-                'keywords': keywords,
-                'summary': summary,
+                'tags': tags
             })
 
     return
