@@ -5,6 +5,8 @@ from airflow.operators.python_operator import PythonOperator
 import datetime
 import os
 
+from newspaper import ArticleException
+
 default_args = {
     'owner': 'niko_huy',
     'start_date': datetime.datetime(2020, 2, 18),
@@ -31,15 +33,18 @@ def newspaper_scraper(templates_dict, language, **context):
 
     paper = newspaper.build(newspaper_url, language=language, memoize_articles=False, MIN_WORD_COUNT=100)
     for article in paper.articles:
-        article.download()
-        article.parse()
+        try:
+            article.download()
+            article.parse()
 
-        data = extract_data(article)
-        data["fetched_at"] = timestamp
+            data = extract_data(article)
+            data["fetched_at"] = timestamp
 
-        # prevent duplicates
-        if collection.count_documents({'headline': article.title}) == 0:
-            collection.insert_one(data)
+            # prevent duplicates
+            if collection.count_documents({'headline': article.title}) == 0:
+                collection.insert_one(data)
+        except ArticleException:
+            print('article could not be scraped from url {}'.format(article.url))
 
     return
 
