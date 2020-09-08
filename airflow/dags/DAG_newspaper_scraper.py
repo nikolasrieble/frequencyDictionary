@@ -4,6 +4,9 @@ from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 import datetime
 import os
+import psutil
+
+
 
 from newspaper import ArticleException
 
@@ -32,6 +35,9 @@ def newspaper_scraper(templates_dict, language, **context):
     timestamp = datetime.datetime.now()
 
     paper = newspaper.build(newspaper_url, language=language, memoize_articles=False, MIN_WORD_COUNT=100)
+    counter = 0
+    n = len(paper.articles)
+    print("Starting to scrape a total of {} articles".format(n))
     for article in paper.articles:
         try:
             article.download()
@@ -46,7 +52,10 @@ def newspaper_scraper(templates_dict, language, **context):
         except ArticleException:
             print('article could not be scraped from url {}'.format(article.url))
 
-    return
+        process = psutil.Process(os.getpid())
+        print(process.memory_info().rss)
+        print(counter)
+        counter += 1
 
 
 def get_collection(language, templates_dict):
