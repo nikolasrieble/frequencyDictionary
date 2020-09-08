@@ -72,9 +72,11 @@ dag = DAG('newspaper_scraper',
           )
 
 with dag:
-    for language in input_list.keys():
-        scraper = PythonOperator(task_id=f'newspaper_scraper_{language}', python_callable=newspaper_scraper,
-                                 op_kwargs={'language': language})
+    tr_scraper = PythonOperator(task_id=f'newspaper_scraper_tr', python_callable=newspaper_scraper,
+                                op_kwargs={'language': 'tr'})
+    de_scraper = PythonOperator(task_id=f'newspaper_scraper_tr', python_callable=newspaper_scraper,
+                                op_kwargs={'language': 'tr'})
+    de_scraper.set_upstream(tr_scraper)
 
 if __name__ == '__main__':
     from pathlib import Path
