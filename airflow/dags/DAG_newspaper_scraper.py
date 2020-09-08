@@ -74,8 +74,8 @@ dag = DAG('newspaper_scraper',
 with dag:
     tr_scraper = PythonOperator(task_id=f'newspaper_scraper_tr', python_callable=newspaper_scraper,
                                 op_kwargs={'language': 'tr'})
-    de_scraper = PythonOperator(task_id=f'newspaper_scraper_tr', python_callable=newspaper_scraper,
-                                op_kwargs={'language': 'tr'})
+    de_scraper = PythonOperator(task_id=f'newspaper_scraper_de', python_callable=newspaper_scraper,
+                                op_kwargs={'language': 'de'})
     de_scraper.set_upstream(tr_scraper)
 
 if __name__ == '__main__':
