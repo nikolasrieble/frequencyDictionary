@@ -27,32 +27,60 @@ input_list = {
 }
 
 
-def url_scraper(templates_dict, language, **context):
+def url_processor(templates_dict, language, **context):
     collection = get_collection(language, templates_dict)
     newspaper_url = input_list.get(language)
+    timestamp = datetime.datetime.now()
 
     paper = newspaper.build(newspaper_url,
                             language=language,
                             memoize_articles=False,
                             fetch_images=False,
                             MIN_WORD_COUNT=100)
-
+    counter = 0
+    n = len(paper.articles)
+    print("Starting to scrape a total of {} articles".format(n))
     for article in paper.articles:
-        # prevent duplicates
-        if collection.count_documents({'url': article.url}) == 0:
-            collection.insert_one({'url': article.url, 'scraped': 0})
+        try:
+            article.download()
+            article.parse()
+
+            data = extract_data(article)
+            data["fetched_at"] = timestamp
+
+            # prevent duplicates
+            if collection.count_documents({'headline': article.title}) == 0:
+                collection.insert_one(data)
+        except ArticleException:
+            print('article could not be scraped from url {}'.format(article.url))
+
+        process = psutil.Process(os.getpid())
+        print(process.memory_info().rss)
+        print(counter)
+        counter += 1
 
 
 def get_collection(language, templates_dict):
     mongodb_string = templates_dict.get('mongodb_string')
     assert mongodb_string
     myclient = pymongo.MongoClient(mongodb_string)
-    mydb = myclient['TODO']
+    mydb = myclient['newspaper']
     collection = mydb[language]
     return collection
 
 
-dag = DAG('url_scraper',
+def extract_data(article):
+    return {
+        'published_at': article.publish_date,
+        'text': article.text,
+        'authors': list(article.authors),
+        'headline': article.title,
+        'url': article.url,
+        'tags': list(article.tags)
+    }
+
+
+dag = DAG('url_processor',
           schedule_interval='0 0 * * 0',
           description=f'''Scrape website for newspaper''',
           default_args=default_args,
@@ -60,8 +88,8 @@ dag = DAG('url_scraper',
           )
 
 with dag:
-    tr_scraper = PythonOperator(task_id=f'url_scraper_tr', python_callable=url_scraper,
+    tr_scraper = PythonOperator(task_id=f'url_processor_tr', python_callable=url_processor,
                                 op_kwargs={'language': 'tr'})
-    de_scraper = PythonOperator(task_id=f'url_scraper_de', python_callable=url_scraper,
+    de_scraper = PythonOperator(task_id=f'url_processor_de', python_callable=url_processor,
                                 op_kwargs={'language': 'de'})
     de_scraper.set_upstream(tr_scraper)
