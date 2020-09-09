@@ -28,7 +28,7 @@ input_list = {
 
 
 def url_scraper(templates_dict, language, **context):
-    collection = get_collection(language, templates_dict)
+    collection = get_collection(templates_dict)
     newspaper_url = input_list.get(language)
 
     paper = newspaper.build(newspaper_url,
@@ -40,15 +40,17 @@ def url_scraper(templates_dict, language, **context):
     for article in paper.articles:
         # prevent duplicates
         if collection.count_documents({'url': article.url}) == 0:
-            collection.insert_one({'url': article.url, 'scraped': 0})
+            collection.insert_one({'url': article.url,
+                                   'scraped': 0,
+                                   'language':language})
 
 
-def get_collection(language, templates_dict):
+def get_collection(templates_dict):
     mongodb_string = templates_dict.get('mongodb_string')
     assert mongodb_string
     myclient = pymongo.MongoClient(mongodb_string)
     mydb = myclient['TODO']
-    collection = mydb[language]
+    collection = mydb['TODO']
     return collection
 
 
