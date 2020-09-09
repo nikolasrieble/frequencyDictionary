@@ -15,10 +15,7 @@ default_args = {
     'retries': 1,
     'retry_delay': datetime.timedelta(minutes=5),
     'execution_timeout': datetime.timedelta(minutes=60),
-    'pool': 'default_pool',
-    'templates_dict': {
-        'mongodb_string': os.environ.get('MONGO_DB'),
-    }
+    'pool': 'default_pool'
 }
 
 
@@ -76,8 +73,8 @@ def extract_data(article):
         'tags': list(article.tags)
     }
 
-def conditionally_trigger(templates_dict, dag_run_obj, **context):
-    if get_article_to_scrape(templates_dict):
+def conditionally_trigger(dag_run_obj, **context):
+    if get_article_to_scrape():
         return dag_run_obj
 
 
