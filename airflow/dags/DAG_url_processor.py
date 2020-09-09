@@ -73,7 +73,8 @@ def extract_data(article):
         'tags': list(article.tags)
     }
 
-def conditionally_trigger(dag_run_obj, **context):
+
+def conditionally_trigger(context, dag_run_obj):
     if get_article_to_scrape():
         return dag_run_obj
 
