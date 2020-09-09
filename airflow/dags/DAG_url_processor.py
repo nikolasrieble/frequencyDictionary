@@ -39,7 +39,7 @@ def url_processor(templates_dict, **context):
             data = extract_data(article)
             data["fetched_at"] = timestamp
 
-            collection = get_collection()
+            collection = get_collection(target_dict["language"], templates_dict)
             # prevent duplicates
             if collection.count_documents({'headline': article.title}) == 0:
                 collection.insert_one(data)
