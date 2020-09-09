@@ -5,7 +5,6 @@ from airflow.operators.dagrun_operator import TriggerDagRunOperator
 from airflow.operators.python_operator import PythonOperator
 import datetime
 import os
-import psutil
 
 from newspaper import ArticleException
 
@@ -26,22 +25,24 @@ default_args = {
 def url_processor(templates_dict, **context):
     timestamp = datetime.datetime.now()
     target_dict = get_article_to_scrape(templates_dict)
-    article = Article.build(target_dict["url"])
 
-    try:
-        article.download()
-        article.parse()
+    if target_dict is not None:
+        article = Article.build(target_dict["url"])
 
-        data = extract_data(article)
-        data["fetched_at"] = timestamp
+        try:
+            article.download()
+            article.parse()
 
-        collection = get_collection()
-        # prevent duplicates
-        if collection.count_documents({'headline': article.title}) == 0:
-            collection.insert_one(data)
+            data = extract_data(article)
+            data["fetched_at"] = timestamp
 
-    except ArticleException:
-        print('article could not be scraped from url {}'.format(article.url))
+            collection = get_collection()
+            # prevent duplicates
+            if collection.count_documents({'headline': article.title}) == 0:
+                collection.insert_one(data)
+
+        except ArticleException:
+            print('article could not be scraped from url {}'.format(article.url))
 
 
 def get_article_to_scrape(templates_dict):
