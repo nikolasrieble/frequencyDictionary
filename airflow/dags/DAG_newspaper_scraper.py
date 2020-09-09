@@ -6,8 +6,6 @@ import datetime
 import os
 import psutil
 
-
-
 from newspaper import ArticleException
 
 default_args = {
@@ -34,7 +32,11 @@ def newspaper_scraper(templates_dict, language, **context):
     newspaper_url = input_list.get(language)
     timestamp = datetime.datetime.now()
 
-    paper = newspaper.build(newspaper_url, language=language, memoize_articles=False, MIN_WORD_COUNT=100)
+    paper = newspaper.build(newspaper_url,
+                            language=language,
+                            memoize_articles=False,
+                            fetch_images=False,
+                            MIN_WORD_COUNT=100)
     counter = 0
     n = len(paper.articles)
     print("Starting to scrape a total of {} articles".format(n))
