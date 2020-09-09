@@ -27,7 +27,10 @@ def url_processor(templates_dict, **context):
     target_dict = get_article_to_scrape(templates_dict)
 
     if target_dict is not None:
-        article = Article.build(target_dict["url"])
+
+        print(target_dict)
+
+        article = Article(target_dict["url"])
 
         try:
             article.download()
