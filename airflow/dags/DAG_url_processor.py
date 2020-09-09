@@ -22,9 +22,9 @@ default_args = {
 }
 
 
-def url_processor(templates_dict, **context):
+def url_processor(**context):
     timestamp = datetime.datetime.now()
-    target_dict = get_article_to_scrape(templates_dict)
+    target_dict = get_article_to_scrape()
 
     if target_dict is not None:
 
@@ -39,7 +39,7 @@ def url_processor(templates_dict, **context):
             data = extract_data(article)
             data["fetched_at"] = timestamp
 
-            collection = get_collection(target_dict["language"], templates_dict)
+            collection = get_collection(target_dict["language"])
             # prevent duplicates
             if collection.count_documents({'headline': article.title}) == 0:
                 collection.insert_one(data)
@@ -48,8 +48,8 @@ def url_processor(templates_dict, **context):
             print('article could not be scraped from url {}'.format(article.url))
 
 
-def get_article_to_scrape(templates_dict):
-    mongodb_string = templates_dict.get('mongodb_string')
+def get_article_to_scrape():
+    mongodb_string = os.environ.get('MONGO_DB')
     assert mongodb_string
     myclient = pymongo.MongoClient(mongodb_string)
     mydb = myclient['TODO']
@@ -57,8 +57,8 @@ def get_article_to_scrape(templates_dict):
     return db.find_one({'scraped': 0})
 
 
-def get_collection(language, templates_dict):
-    mongodb_string = templates_dict.get('mongodb_string')
+def get_collection(language):
+    mongodb_string = os.environ.get('MONGO_DB')
     assert mongodb_string
     myclient = pymongo.MongoClient(mongodb_string)
     mydb = myclient['newspaper']
