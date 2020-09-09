@@ -89,11 +89,11 @@ dag = DAG('url_processor_dag',
           )
 
 with dag:
-    processor = PythonOperator(task_id='url_processor_operator', python_callable=url_processor)
+    processor = PythonOperator(task_id='url_processor_operator',
+                               python_callable=url_processor)
     trigger = TriggerDagRunOperator(
         task_id='trigger_url_processor_operator',
         trigger_dag_id="url_processor_dag",
-        python_callable=conditionally_trigger,
-        dag=dag
+        python_callable=conditionally_trigger
     )
     trigger.set_upstream(processor)
