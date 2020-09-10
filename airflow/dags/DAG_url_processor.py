@@ -84,7 +84,8 @@ def extract_data(article):
 
 
 def conditionally_trigger(context, dag_run_obj):
-    if get_article_to_scrape() is not None:
+    myclient = get_db_client()
+    if get_article_to_scrape(myclient) is not None:
         return dag_run_obj
 
 
