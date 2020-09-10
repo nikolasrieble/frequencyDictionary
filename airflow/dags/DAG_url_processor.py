@@ -41,8 +41,19 @@ def url_processor(**context):
             if collection.count_documents({'headline': article.title}) == 0:
                 collection.insert_one(data)
 
+            update_todo_list(target_dict)
+
         except ArticleException:
             print('article could not be scraped from url {}'.format(article.url))
+
+
+def update_todo_list(target_dict):
+    mongodb_string = os.environ.get('MONGO_DB')
+    assert mongodb_string
+    myclient = pymongo.MongoClient(mongodb_string)
+    mydb = myclient['TODO']
+    db = mydb['TODO']
+    return db.update_one({'url': target_dict['url']}, {'$set': {'scraped': 1}}, upsert=False)
 
 
 def get_article_to_scrape():
