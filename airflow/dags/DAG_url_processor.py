@@ -20,13 +20,13 @@ default_args = {
 
 
 def url_processor(**context):
+
+    myclient = get_db_client()
+
     timestamp = datetime.datetime.now()
-    target_dict = get_article_to_scrape()
+    target_dict = get_article_to_scrape(myclient)
 
     if target_dict is not None:
-
-        print(target_dict)
-
         article = Article(target_dict["url"])
 
         try:
@@ -36,39 +36,37 @@ def url_processor(**context):
             data = extract_data(article)
             data["fetched_at"] = timestamp
 
-            collection = get_collection(target_dict["language"])
+            collection = get_collection(myclient, target_dict["language"])
             # prevent duplicates
             if collection.count_documents({'headline': article.title}) == 0:
                 collection.insert_one(data)
 
-            update_todo_list(target_dict)
+            update_todo_list(myclient, target_dict)
 
         except ArticleException:
             print('article could not be scraped from url {}'.format(article.url))
 
 
-def update_todo_list(target_dict):
-    mongodb_string = os.environ.get('MONGO_DB')
-    assert mongodb_string
-    myclient = pymongo.MongoClient(mongodb_string)
+def update_todo_list(myclient, target_dict):
     mydb = myclient['TODO']
     db = mydb['TODO']
     return db.update_one({'url': target_dict['url']}, {'$set': {'scraped': 1}}, upsert=False)
 
 
-def get_article_to_scrape():
+def get_db_client():
     mongodb_string = os.environ.get('MONGO_DB')
     assert mongodb_string
     myclient = pymongo.MongoClient(mongodb_string)
+    return myclient
+
+
+def get_article_to_scrape(myclient):
     mydb = myclient['TODO']
     db = mydb['TODO']
     return db.find_one({'scraped': 0})
 
 
-def get_collection(language):
-    mongodb_string = os.environ.get('MONGO_DB')
-    assert mongodb_string
-    myclient = pymongo.MongoClient(mongodb_string)
+def get_collection(myclient, language):
     mydb = myclient['newspaper']
     collection = mydb[language]
     return collection
