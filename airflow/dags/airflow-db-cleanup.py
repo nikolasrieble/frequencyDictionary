@@ -26,6 +26,7 @@ from sqlalchemy.orm import load_only
 try:
     # airflow.utils.timezone is available from v1.10 onwards
     from airflow.utils import timezone
+
     now = timezone.utcnow
 except ImportError:
     now = datetime.utcnow
@@ -45,7 +46,8 @@ ALERT_EMAIL_ADDRESSES = []
 DEFAULT_MAX_DB_ENTRY_AGE_IN_DAYS = int(
     Variable.get("airflow_db_cleanup__max_db_entry_age_in_days", 30)
 )
-# Prints the database entries which will be getting deleted; set to False to avoid printing large lists and slowdown process
+# Prints the database entries which will be getting deleted; set to False to avoid printing large lists and slowdown
+# process
 PRINT_DELETES = True
 # Whether the job should delete the db entries or not. Included if you want to
 # temporarily avoid deleting the db entries.
@@ -106,6 +108,7 @@ DATABASE_OBJECTS = [
 # Check for TaskReschedule model
 try:
     from airflow.models import TaskReschedule
+
     DATABASE_OBJECTS.append({
         "airflow_db_model": TaskReschedule,
         "age_check_column": TaskReschedule.execution_date,
@@ -120,6 +123,7 @@ except Exception as e:
 # Check for TaskFail model
 try:
     from airflow.models import TaskFail
+
     DATABASE_OBJECTS.append({
         "airflow_db_model": TaskFail,
         "age_check_column": TaskFail.execution_date,
@@ -134,6 +138,7 @@ except Exception as e:
 # Check for RenderedTaskInstanceFields model
 try:
     from airflow.models import RenderedTaskInstanceFields
+
     DATABASE_OBJECTS.append({
         "airflow_db_model": RenderedTaskInstanceFields,
         "age_check_column": RenderedTaskInstanceFields.execution_date,
@@ -148,6 +153,7 @@ except Exception as e:
 # Check for ImportError model
 try:
     from airflow.models import ImportError
+
     DATABASE_OBJECTS.append({
         "airflow_db_model": ImportError,
         "age_check_column": ImportError.timestamp,
@@ -162,10 +168,11 @@ except Exception as e:
 # Check for celery executor
 airflow_executor = str(conf.get("core", "executor"))
 logging.info("Airflow Executor: " + str(airflow_executor))
-if(airflow_executor == "CeleryExecutor"):
+if (airflow_executor == "CeleryExecutor"):
     logging.info("Including Celery Modules")
     try:
         from celery.backends.database.models import Task, TaskSet
+
         DATABASE_OBJECTS.extend((
             {
                 "airflow_db_model": Task,
@@ -250,7 +257,6 @@ print_configuration = PythonOperator(
 
 
 def cleanup_function(**context):
-
     logging.info("Retrieving max_execution_date from XCom")
     max_date = context["ti"].xcom_pull(
         task_ids=print_configuration.task_id, key="max_date"
@@ -310,7 +316,7 @@ def cleanup_function(**context):
             )
 
         else:
-            query = query.filter(age_check_column <= max_date,)
+            query = query.filter(age_check_column <= max_date, )
 
         if PRINT_DELETES:
             entries_to_delete = query.all()
@@ -353,7 +359,6 @@ def cleanup_function(**context):
 
 
 for db_object in DATABASE_OBJECTS:
-
     cleanup_op = PythonOperator(
         task_id='cleanup_' + str(db_object["airflow_db_model"].__name__),
         python_callable=cleanup_function,
