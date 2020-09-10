@@ -79,7 +79,7 @@ DATABASE_OBJECTS = [
     {
         "airflow_db_model": Log,
         "age_check_column": Log.dttm,
-        "keep_last": False,
+        "keep_last": True,
         "keep_last_filters": None,
         "keep_last_group_by": None
     },
