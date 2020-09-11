@@ -40,5 +40,4 @@ dag = DAG('cleanup_airflow_DAG',
           )
 
 with dag:
-    tr_scraper = PythonOperator(task_id=f'cleanup_airflow_db', python_callable=cleanup_airflow_db,
-                                op_kwargs={'language': 'tr'})
+    cleanup = PythonOperator(task_id=f'cleanup_airflow_db', python_callable=cleanup_airflow_db)
