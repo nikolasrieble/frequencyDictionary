@@ -14,7 +14,7 @@ default_args = {
     'execution_timeout': datetime.timedelta(minutes=60),
     'pool': 'default_pool',
     'templates_dict': {
-        'airflow_db': os.environ.get('AIRFLOW_DB'),
+        'airflow_db': os.environ.get('AIRFLOW__CORE__SQL_ALCHEMY_CONN'),
     }
 }
 
