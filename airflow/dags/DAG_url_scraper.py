@@ -55,7 +55,7 @@ def get_collection(templates_dict):
 
 
 dag = DAG('url_scraper',
-          schedule_interval='0 0 * * 0',
+          schedule_interval='0 */12 * * *',
           description=f'''Scrape website for newspaper''',
           default_args=default_args,
           catchup=False,
