@@ -33,7 +33,7 @@ def cleanup_airflow_db(templates_dict, **context):
 
 
 dag = DAG('cleanup_airflow_DAG',
-          schedule_interval='0 0 * * 0',
+          schedule_interval='0 0 * * *',
           description=f'''Scrape website for newspaper''',
           default_args=default_args,
           catchup=False,
