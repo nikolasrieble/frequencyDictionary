@@ -90,7 +90,7 @@ def conditionally_trigger(context, dag_run_obj):
 
 
 dag = DAG('url_processor_dag',
-          schedule_interval='0 0 * * 0',
+          schedule_interval='* * * * *',
           description='Scrape website for newspaper',
           default_args=default_args,
           catchup=False,
