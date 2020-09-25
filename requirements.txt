@@ -1,5 +1,5 @@
 scipy
-pymongdo
+pymongo
 mongodb
 numpy
 pandas
