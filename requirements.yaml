@@ -6,7 +6,6 @@ dependencies:
   - python=3.8
   - scipy
   - pymongo
-  - mongodb
   - numpy
   - pandas
   - scikit-learn

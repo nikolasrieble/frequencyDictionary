@@ -1,6 +1,5 @@
 scipy
 pymongo
-mongodb
 numpy
 pandas
 scikit-learn
